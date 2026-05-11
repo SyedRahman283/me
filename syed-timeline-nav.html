@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Syed Rahman — Portfolio</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #ffffff;
+    --bg2:       #f7f6f3;
+    --text:      #1a1a1a;
+    --text2:     #666;
+    --text3:     #aaa;
+    --border:    rgba(0,0,0,0.10);
+    --border2:   rgba(0,0,0,0.18);
+    --radius:    10px;
+    --sidebar-w: 200px;
+    --accent:    #1a1a1a;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:      #1a1a1a;
+      --bg2:     #242424;
+      --text:    #f0f0f0;
+      --text2:   #999;
+      --text3:   #555;
+      --border:  rgba(255,255,255,0.10);
+      --border2: rgba(255,255,255,0.20);
+      --accent:  #f0f0f0;
+    }
+  }
+
+  html, body {
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  /* ── Layout ── */
+  .layout {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    flex-shrink: 0;
+    border-right: 0.5px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 2.5rem 0 2rem 1.5rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+  }
+
+  .site-name {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    margin-bottom: 3rem;
+  }
+
+  /* ── Timeline ── */
+  .timeline {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .timeline-line {
+    position: absolute;
+    left: 5px;
+    top: 10px;
+    bottom: 10px;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .tl-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 10px 0;
+    cursor: pointer;
+    position: relative;
+    text-decoration: none;
+  }
+
+  .tl-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border2);
+    background: var(--bg);
+    flex-shrink: 0;
+    margin-top: 3px;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tl-item:hover .tl-dot {
+    border-color: var(--accent);
+    transform: scale(1.15);
+  }
+
+  .tl-item.active .tl-dot {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .tl-text { display: flex; flex-direction: column; gap: 2px; }
+
+  .tl-label {
+    font-size: 13px;
+    color: var(--text2);
+    transition: color 0.2s;
+    line-height: 1;
+  }
+
+  .tl-sublabel {
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  .tl-item:hover .tl-label,
+  .tl-item.active .tl-label {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* ── Contact button ── */
+  .contact-btn {
+    margin-right: 1.5rem;
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    background: none;
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+    text-decoration: none;
+  }
+  .contact-btn:hover { background: var(--bg2); }
+
+  /* ── Main content ── */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    padding: 3rem 3.5rem;
+    max-width: 780px;
+  }
+
+  .section { display: none; }
+  .section.visible { display: block; }
+
+  .section-tag {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 0.75rem;
+  }
+
+  .section-title {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+
+  .section-body {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text2);
+    max-width: 520px;
+  }
+
+  /* ── Project cards ── */
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 1.5rem;
+  }
+
+  .project-card {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+  .project-card:hover {
+    border-color: var(--border2);
+    transform: translateY(-2px);
+  }
+
+  .project-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 5px;
+  }
+
+  .project-card-course {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+
+  .project-card-desc {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+
+  /* ── Skills ── */
+  .skill-group { margin-top: 1.5rem; }
+  .skill-group-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .skill-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .pill {
+    font-size: 13px;
+    color: var(--text2);
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: 99px;
+    padding: 5px 14px;
+  }
+
+  /* ── Education ── */
+  .edu-block {
+    margin-top: 1.25rem;
+    border-left: 2px solid var(--border);
+    padding-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .edu-school { font-size: 16px; font-weight: 600; color: var(--text); }
+  .edu-degree { font-size: 14px; color: var(--text2); }
+  .edu-year   { font-size: 12px; color: var(--text3); }
+  .edu-courses {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .edu-course-item {
+    font-size: 13px;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .edu-course-item::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--text3);
+    flex-shrink: 0;
+  }
+
+  /* ── Contact form ── */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 1.5rem;
+    max-width: 480px;
+  }
+  .contact-grid .full { grid-column: 1 / -1; }
+  .form-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text3);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .form-input, .form-textarea {
+    width: 100%;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text);
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-input:focus, .form-textarea:focus { border-color: var(--border2); }
+  .form-textarea { resize: vertical; min-height: 100px; }
+  .submit-btn {
+    grid-column: 1 / -1;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bg);
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    padding: 11px 20px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .submit-btn:hover { opacity: 0.8; }
+
+  /* ── Mobile ── */
+  .mobile-bar {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 52px;
+    background: var(--bg);
+    border-bottom: 0.5px solid var(--border);
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.25rem;
+    z-index: 100;
+  }
+  .mobile-logo { font-size: 14px; font-weight: 600; color: var(--text); }
+  .hamburger-btn {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .hamburger-btn span {
+    width: 20px; height: 1.5px;
+    background: var(--text2);
+    border-radius: 2px;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+  .hamburger-btn.open span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
+  .hamburger-btn.open span:nth-child(2) { opacity: 0; }
+  .hamburger-btn.open span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
+
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    top: 52px; left: 0; right: 0; bottom: 0;
+    background: var(--bg);
+    z-index: 99;
+    flex-direction: column;
+    padding: 1rem 1.25rem;
+    border-top: 0.5px solid var(--border);
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 0.5px solid var(--border);
+    font-size: 15px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+  .mobile-nav-item.active, .mobile-nav-item:hover { color: var(--text); font-weight: 500; }
+  .mobile-nav-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border2);
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  .mobile-nav-item.active .mobile-nav-dot { background: var(--accent); border-color: var(--accent); }
+
+  @media (max-width: 680px) {
+    .sidebar { display: none; }
+    .mobile-bar { display: flex; }
+    .main { margin-left: 0; padding: 5rem 1.25rem 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Mobile top bar -->
+<div class="mobile-bar">
+  <span class="mobile-logo">Syed Rahman</span>
+  <button class="hamburger-btn" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</div>
+
+<!-- Mobile slide-down menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-nav-item active" onclick="navigate('about', this, true)">
+    <div class="mobile-nav-dot"></div> About
+  </div>
+  <div class="mobile-nav-item" onclick="navigate('projects', this, true)">
+    <div class="mobile-nav-dot"></div> Projects
+  </div>
+  <div class="mobile-nav-item" onclick="navigate('experience', this, true)">
+    <div class="mobile-nav-dot"></div> Experience
+  </div>
+  <div class="mobile-nav-item" onclick="navigate('education', this, true)">
+    <div class="mobile-nav-dot"></div> Education
+  </div>
+  <div class="mobile-nav-item" onclick="navigate('contact', this, true)">
+    <div class="mobile-nav-dot"></div> Contact
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="site-name">Syed Rahman</div>
+
+    <nav class="timeline" aria-label="Page sections">
+      <div class="timeline-line" aria-hidden="true"></div>
+
+      <div class="tl-item active" onclick="navigate('about', this)" role="button" tabindex="0">
+        <div class="tl-dot"></div>
+        <div class="tl-text">
+          <span class="tl-label">About</span>
+          <span class="tl-sublabel">Who I am</span>
+        </div>
+      </div>
+
+      <div class="tl-item" onclick="navigate('projects', this)" role="button" tabindex="0">
+        <div class="tl-dot"></div>
+        <div class="tl-text">
+          <span class="tl-label">Projects</span>
+          <span class="tl-sublabel">My work</span>
+        </div>
+      </div>
+
+      <div class="tl-item" onclick="navigate('experience', this)" role="button" tabindex="0">
+        <div class="tl-dot"></div>
+        <div class="tl-text">
+          <span class="tl-label">Experience</span>
+          <span class="tl-sublabel">Skills & tools</span>
+        </div>
+      </div>
+
+      <div class="tl-item" onclick="navigate('education', this)" role="button" tabindex="0">
+        <div class="tl-dot"></div>
+        <div class="tl-text">
+          <span class="tl-label">Education</span>
+          <span class="tl-sublabel">Wayne State</span>
+        </div>
+      </div>
+
+      <div class="tl-item" onclick="navigate('contact', this)" role="button" tabindex="0">
+        <div class="tl-dot"></div>
+        <div class="tl-text">
+          <span class="tl-label">Contact</span>
+          <span class="tl-sublabel">Get in touch</span>
+        </div>
+      </div>
+    </nav>
+
+    <a href="mailto:your@email.com" class="contact-btn">✉ Email me</a>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main">
+
+    <!-- About -->
+    <section class="section visible" id="sec-about">
+      <div class="section-tag">Introduction</div>
+      <h1 class="section-title">Industrial Engineering Student</h1>
+      <p class="section-body">
+        Freshman in the Industrial Engineering program at Wayne State University, expected to graduate in 2029.
+        Focused on process optimization, CAD modelling, and data-driven solutions to real engineering challenges.
+        Known for being inquisitive, hard working, and committed to growing valuable industry skills.
+      </p>
+    </section>
+
+    <!-- Projects -->
+    <section class="section" id="sec-projects">
+      <div class="section-tag">Work</div>
+      <h1 class="section-title">Projects</h1>
+      <div class="project-grid">
+
+        <div class="project-card">
+          <div class="project-card-course">IE 1000</div>
+          <div class="project-card-title">Pop-up Factory</div>
+          <div class="project-card-desc">
+            Analyzed and modeled the logistics and feasibility of a popup factory from start to finish,
+            collaborating with teams to evaluate cost efficiency and practicality.
+          </div>
+        </div>
+
+        <div class="project-card">
+          <div class="project-card-course">Honors Physics</div>
+          <div class="project-card-title">Electric House</div>
+          <div class="project-card-desc">
+            Planned, designed, and built a miniature house model with complete parallel and series circuits
+            throughout. Demonstrated working knowledge of circuit design.
+          </div>
+        </div>
+
+        <div class="project-card">
+          <div class="project-card-course">CAS Project</div>
+          <div class="project-card-title">Custom Chess Board</div>
+          <div class="project-card-desc">
+            Designed and built a space-themed custom chess board to fulfill the CAS project requirement.
+            Focused on craftsmanship and creative design.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Experience -->
+    <section class="section" id="sec-experience">
+      <div class="section-tag">Skills</div>
+      <h1 class="section-title">Experience & Tools</h1>
+      <p class="section-body">Building hands-on skills through coursework and independent projects at Wayne State.</p>
+
+      <div class="skill-group">
+        <div class="skill-group-label">Engineering</div>
+        <div class="skill-pills">
+          <span class="pill">CAD Modelling</span>
+          <span class="pill">Process Optimization</span>
+          <span class="pill">Systems Analysis</span>
+          <span class="pill">Root Cause Analysis</span>
+          <span class="pill">Time Analysis</span>
+        </div>
+      </div>
+
+      <div class="skill-group" style="margin-top:1.5rem;">
+        <div class="skill-group-label">Soft Skills</div>
+        <div class="skill-pills">
+          <span class="pill">Team Collaboration</span>
+          <span class="pill">Problem Solving</span>
+          <span class="pill">Technical Communication</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Education -->
+    <section class="section" id="sec-education">
+      <div class="section-tag">Academic</div>
+      <h1 class="section-title">Education</h1>
+
+      <div class="edu-block">
+        <div class="edu-school">Wayne State University</div>
+        <div class="edu-degree">B.S. Industrial Engineering</div>
+        <div class="edu-year">Expected Graduation: 2029</div>
+      </div>
+
+      <div class="edu-courses">
+        <div class="edu-course-item">Process Optimization & Systems Analysis</div>
+        <div class="edu-course-item">Engineering software and operational analysis tools</div>
+        <div class="edu-course-item">Root Cause Analysis & Time Analysis (in progress)</div>
+        <div class="edu-course-item">Collaborative engineering project work</div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="section" id="sec-contact">
+      <div class="section-tag">Get in touch</div>
+      <h1 class="section-title">Contact</h1>
+      <p class="section-body">Open to internship opportunities, collaborations, and conversations about industrial engineering.</p>
+
+      <div class="contact-grid">
+        <div>
+          <label class="form-label">First name</label>
+          <input class="form-input" type="text" placeholder="Jane" />
+        </div>
+        <div>
+          <label class="form-label">Last name</label>
+          <input class="form-input" type="text" placeholder="Smith" />
+        </div>
+        <div class="full">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" placeholder="jane@example.com" />
+        </div>
+        <div class="full">
+          <label class="form-label">Message</label>
+          <textarea class="form-textarea" placeholder="Hi Syed, I wanted to reach out about..."></textarea>
+        </div>
+        <button class="submit-btn full">Send message</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const sections = ['about','projects','experience','education','contact'];
+
+  function navigate(id, clickedEl, fromMobile) {
+    // Hide all sections, deactivate all nav items
+    sections.forEach(s => {
+      document.getElementById('sec-' + s).classList.remove('visible');
+    });
+    document.querySelectorAll('.tl-item').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
+
+    // Show target section
+    document.getElementById('sec-' + id).classList.add('visible');
+
+    // Mark active in sidebar
+    const sidebarItems = document.querySelectorAll('.tl-item');
+    const idx = sections.indexOf(id);
+    if (sidebarItems[idx]) sidebarItems[idx].classList.add('active');
+
+    // Mark active in mobile menu
+    const mobileItems = document.querySelectorAll('.mobile-nav-item');
+    if (mobileItems[idx]) mobileItems[idx].classList.add('active');
+
+    // Close mobile menu after selection
+    if (fromMobile) {
+      document.getElementById('mobileMenu').classList.remove('open');
+      document.getElementById('hamburger').classList.remove('open');
+    }
+
+    // Scroll to top of content on mobile
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Hamburger toggle
+  document.getElementById('hamburger').addEventListener('click', function() {
+    this.classList.toggle('open');
+    document.getElementById('mobileMenu').classList.toggle('open');
+  });
+
+  // Keyboard nav for sidebar items
+  document.querySelectorAll('.tl-item').forEach((item, i) => {
+    item.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        navigate(sections[i], item);
+      }
+    });
+  });
+</script>
+</body>
+</html>
